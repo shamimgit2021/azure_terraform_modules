@@ -1,0 +1,53 @@
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+resources:
+  repositories:
+    - repository: newtemplates
+      type: github
+      name: shamimgit2021/azure_terraform
+      endpoint: MaryamS_Food
+
+variables:
+  azureServiceConnection: 'MaryamS_Food'
+
+steps:
+
+# 1️⃣ Checkout Terraform GitHub repository
+- checkout: newtemplates
+
+# 2️⃣ Install Terraform
+- task: TerraformInstaller@1
+  displayName: Install Terraform
+  inputs:
+    terraformVersion: 'latest'
+
+# 3️⃣ Terraform Init (NO backend)
+- task: TerraformTaskV4@4
+  displayName: Terraform Init
+  inputs:
+    provider: 'azurerm'
+    command: 'init'
+    workingDirectory: '$(Build.SourcesDirectory)/newtemplates'
+    environmentServiceNameAzureRM: $(azureServiceConnection)
+
+# 4️⃣ Terraform Plan
+- task: TerraformTaskV4@4
+  displayName: Terraform Plan
+  inputs:
+    provider: 'azurerm'
+    command: 'plan'
+    workingDirectory: '$(Build.SourcesDirectory)/newtemplates'
+    environmentServiceNameAzureRM: $(azureServiceConnection)
+
+# 5️⃣ Terraform Apply
+- task: TerraformTaskV4@4
+  displayName: Terraform Apply
+  inputs:
+    provider: 'azurerm'
+    command: 'apply'
+    workingDirectory: '$(Build.SourcesDirectory)/newtemplates'
+    environmentServiceNameAzureRM: $(azureServiceConnection)
